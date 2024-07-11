@@ -131,9 +131,9 @@ def bbox(center_latitude, center_longitude):
 
 
 # 2022 -2021 = 82k wells; read files from Mary Kang's paper: https://iopscience.iop.org/article/10.1088/1748-9326/acdae7/meta
-wells_2021 = pd.ExcelFile("~/Documents/m2m-api/es2c03268_si_002.xlsx")
+wells_2021 = pd.ExcelFile("~/Documents/m2m-api/es2c03268_si_002.xlsx") #download this file from the Documented Orphaned Oil and Gas Wells Across the United States paper by Boutot et. al, 2022 (link at the end of the paper)
 wells_2021 = wells_2021.parse('2021 Orphan Well Dataset', header=0)
-wells_2022 = pd.ExcelFile("~/Documents/m2m-api/es2c03268_si_003.xlsx")
+wells_2022 = pd.ExcelFile("~/Documents/m2m-api/es2c03268_si_003.xlsx") #download this file from the Documented Orphaned Oil and Gas Wells Across the United States paper by Boutot et. al, 2022
 wells_2022 = wells_2022.parse('2022 Orphan Well Dataset', header=0)
 wells_2022['index'] = wells_2022.index
 wells_2021[wells_2021.duplicated(subset=['Latitude', 'Longitude'], keep=False)]
