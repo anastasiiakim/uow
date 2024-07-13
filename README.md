@@ -1,7 +1,8 @@
 # uow
 
 
-Code and scripts for the paper. O# (O4743) UOW dataset and O# (O4742) UOW detection.
+Code and scripts for the paper. 
+
 Files description:
 
 getwells_metadata_paper.py - gather metadata from decimal coordinates using m2m USGS api; output is pkl metadata file
@@ -12,6 +13,7 @@ result_df_box.pkl - pre-saved dataset with computed bounding boxes where wells a
 
 run_positive_script - example of how to submit a job to download images
 
+Approval numbers O# (O4743) UOW dataset and O# (O4742) UOW detection.
 
 © 2024. Triad National Security, LLC. All rights reserved. This program was produced under U.S. Government contract 89233218CNA000001 for Los Alamos National Laboratory (LANL), which is operated by Triad National Security, LLC for the U.S. Department of Energy/National Nuclear Security Administration. All rights in the program are reserved by Triad National Security, LLC, and the U.S. Department of Energy/National Nuclear Security Administration. The Government is granted for itself and others acting on its behalf a nonexclusive, paid-up, irrevocable worldwide license in this material to reproduce, prepare. derivative works, distribute copies to the public, perform publicly and display publicly, and to permit others to do so.
 
