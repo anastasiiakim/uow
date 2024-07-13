@@ -5,8 +5,11 @@ Code and scripts for the paper. O# (O4743) UOW dataset and O# (O4742) UOW detect
 Files description:
 
 getwells_metadata_paper.py - gather metadata from decimal coordinates using m2m USGS api; output is pkl metadata file
+
 positive_selenium_download.py - download NAIP USGS images using Selenium
+
 result_df_box.pkl - pre-saved dataset with computed bounding boxes where wells are
+
 run_positive_script - example of how to submit a job to download images
 
 
