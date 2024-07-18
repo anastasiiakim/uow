@@ -8,6 +8,7 @@ Produced metadata pickle file is used as input for another script (selenium one)
 #run from directory where folder https://github.com/Fergui/m2m-api is located
 import numpy as np
 import pandas as pd
+import random
 import os
 from geopy import distance
 from geopy.point import Point
@@ -246,3 +247,69 @@ alldf['displayId'] = alldf['displayId'].str.lower()
 alldf.rename(columns={'lat': 'latitude', 'long': 'longitude'}, inplace=True)
 alldf = alldf[['state', 'stateId', 'accuracy', 'latitude', 'longitude', 'listIds', 'resolution', 'scenesDate', 'selectedIdFromList', 'entityId', 'displayId']]
 alldf.to_pickle("positive_metadata_to_process.pkl")
+
+
+#get random locations metadata
+def random_location():
+    # Mainland USA approximate bounding box
+    min_lat, max_lat = 24.396308, 49.384358
+    min_lon, max_lon = -125.001650, -66.934570
+    lat = random.uniform(min_lat, max_lat)
+    lon = random.uniform(min_lon, max_lon)
+    return lat, lon
+
+locations = [random_location() for _ in range(100000)]#we'll get say 100k locations
+df = pd.DataFrame(locations, columns=['lat', 'long'])
+df['state'] = 'Unknown' 
+df['entityId'] = 'Unknown' 
+df['displayId'] = 'Unknown' 
+df['browsePath'] = 'Unknown' 
+print(df.head())
+
+distance_meters = 50
+result_df = pd.DataFrame(columns=['index', 'lat', 'long', 'll_lat', 'll_long', 'ur_lat', 'ur_long'])
+for idx, row in df.iterrows():
+    ll_lat, ll_long, ur_lat, ur_long = bbox(row['lat'], row['long'])
+    intersects = ((result_df['ll_lat'] <= row['lat']) & (result_df['ur_lat'] >= row['lat']) &
+               (result_df['ll_long'] <= row['long']) & (result_df['ur_long'] >= row['long'])).any()
+    if not intersects:
+        result_df = pd.concat([result_df, pd.DataFrame([{'index': idx, 'lat': row['lat'], 'long': row['long'], 'll_lat': ll_lat, 'll_long': ll_long, 'ur_lat': ur_lat, 'ur_long': ur_long}])], ignore_index=True)
+
+
+m2m = M2M("your_username", "your_password")
+label='m2m-api_download'
+labels = [label]
+datasetName = 'naip'
+
+nmdf = result_df
+nmdf['downloadsCount'] = 'Unknown'
+nmdf['browsePath'] = 'Unknown'
+nmdf['entityId'] = 'Unknown'
+nmdf['displayId'] = 'Unknown'
+nmdf['temporalCoverage'] = 'Unknown'
+
+for idx, row in nmdf.iterrows():
+    if idx%200 == 0:
+        print(idx)
+        m2m = M2M("your_username", "your_password")
+    params = {
+        "datasetName": "naip",
+        "startDate": "2015-01-01",
+        "endDate": "2023-08-01",
+        "boundingBox": (row['ll_long'], row['ur_long'], row['ll_lat'], row['ur_lat'])
+    }
+    scenes = m2m.searchScenes(**params)
+    if scenes['totalHits'] == 0:
+        print("Error, no recent images found. Change the date.", idx, row)
+        nmdf.at[idx, 'downloadsCount'] = 0
+    else:    
+        nmdf.at[idx, 'downloadsCount'] = 1
+        nmdf.at[idx, 'browsePath'] = scenes['results'][0]['browse'][0]['browsePath']
+        nmdf.at[idx, 'entityId'] = scenes['results'][0]['entityId']
+        nmdf.at[idx, 'displayId'] = scenes['results'][0]['displayId']
+        nmdf.at[idx, 'temporalCoverage'] = scenes['results'][0]['temporalCoverage']
+nmdf.to_pickle("negative_metadata_to_process.pkl")
+
+
+
+
