@@ -1,0 +1,15 @@
+#!/bin/bash -l
+#SBATCH --output=job_%j.log
+#SBATCH --qos=standard
+#SBATCH -p gpu
+#SBATCH -t 10:00:00
+
+module load python/3.10-anaconda-2023.03 #load python module
+source activate
+conda activate env_wells #environment with packages
+export PATH=$PATH:/nm_wells #path where Selenium geckodriver is
+proxy-on #in case proxies needed to download
+python3 negative_selenium_download.py ${start_in} ${end_in} 
+
+#to run first 5000 ordered entityIds:
+#sbatch --export=start=0,end=5000 run_negative_script
